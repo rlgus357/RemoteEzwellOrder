@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.hanbada.graves.R;
+import com.hanbada.graves.common.PermissionCheck;
 import com.hanbada.graves.common.StateMaintainer;
 import com.hanbada.graves.main.Main;
 import com.hanbada.graves.main.model.MainModel;
@@ -27,9 +29,6 @@ public class MainActivity extends AppCompatActivity implements Main.RequiredView
     private final StateMaintainer mStateMaintainer = new StateMaintainer( getSupportFragmentManager(), MainActivity.class.getName());
     private Main.ProvidedPresenterOps mPresenter;
 
-    private static final int REQUEST_READ_PHONE_NUMBER = 1;
-    private static final int REQUEST_READ_PHONE_STATE = 2;
-
     protected  final String TAG = getClass().getSimpleName();
 
     @Override
@@ -40,10 +39,11 @@ public class MainActivity extends AppCompatActivity implements Main.RequiredView
         this.setupView();
         this.setupConfiguration();
 
-        this.checkAndRequestPermissions();
+//        this.checkAndRequestPermissions();
     }
 
     private void setupView(){
+
         mLoginBtn = (Button)findViewById(R.id.EzwellLoginBtn);
 
         mLoginBtn.setOnClickListener(this);
@@ -67,13 +67,10 @@ public class MainActivity extends AppCompatActivity implements Main.RequiredView
 
     private void checkAndRequestPermissions(){
 
-        if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED){
+        PermissionCheck permissionCheck = new PermissionCheck();
+//        permissionCheck.isCheck(MainActivity.this,getAppContext(),"문자읽기","Manifest.permission.READ_SMS");
+//        permissionCheck.isCheck(MainActivity.this,getAppContext(),"Manifest.permission.READ_PHONE_NUMBERS","번호읽기");
 
-            ActivityCompat.requestPermissions(this, new String[]{ Manifest.permission.READ_PHONE_STATE }, REQUEST_READ_PHONE_STATE);
-
-        }else{
-
-        }
     }
 
     @Override
@@ -127,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements Main.RequiredView
         }
     }
 
+/*
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
@@ -153,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements Main.RequiredView
 
         }
     }
+*/
 
 
 

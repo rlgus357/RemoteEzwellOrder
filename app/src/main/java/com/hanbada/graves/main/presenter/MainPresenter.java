@@ -20,7 +20,7 @@ public class MainPresenter implements Main.ProvidedPresenterOps, Main.RequiredPr
     private WeakReference<Main.RequiredViewOps> mView;
     private Main.ProvidedModelOps mModel;
 
-    private static final String CONNECTION_IP = "172.30.1.35";
+    private static final String CONNECTION_IP = "192.168.43.184";
 
     public MainPresenter (Main.RequiredViewOps view){
         mView = new WeakReference<Main.RequiredViewOps>(view);
