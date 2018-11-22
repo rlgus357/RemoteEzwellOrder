@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Button;
 
+import com.hanbada.graves.Contants.Contants;
 import com.hanbada.graves.common.RequestHttpURLConnection;
 import com.hanbada.graves.main.Main;
 import com.hanbada.graves.main.model.MainModel;
@@ -19,8 +20,6 @@ public class MainPresenter implements Main.ProvidedPresenterOps, Main.RequiredPr
 
     private WeakReference<Main.RequiredViewOps> mView;
     private Main.ProvidedModelOps mModel;
-
-    private static final String CONNECTION_IP = "192.168.43.184";
 
     public MainPresenter (Main.RequiredViewOps view){
         mView = new WeakReference<Main.RequiredViewOps>(view);
@@ -39,7 +38,7 @@ public class MainPresenter implements Main.ProvidedPresenterOps, Main.RequiredPr
 
         Log.i(TAG,"clickLogBtn");
 
-        String strConnectionUrl = "http://" + CONNECTION_IP + ":8080/Graves/Ezwell/requestAuthCode.do";
+        String strConnectionUrl = "http://" + Contants.CONNECTION_IP + ":8080/Graves/Ezwell/requestAuthCode.do";
 
         // Async Task => HttpURLConnection
         ContentValues phoneNumContent = new ContentValues();
@@ -59,6 +58,11 @@ public class MainPresenter implements Main.ProvidedPresenterOps, Main.RequiredPr
     @Override
     public void setView(Main.RequiredViewOps view) {
         mView = new WeakReference<Main.RequiredViewOps>(view);
+    }
+
+    @Override
+    public void sendAuthCode(String strAuthCode) {
+        Log.d(TAG,strAuthCode);
     }
 
     public void setModel(MainModel model) {

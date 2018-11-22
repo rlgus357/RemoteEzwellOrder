@@ -24,6 +24,7 @@ public interface Main {
 
         void clickLoginEzwell(Button btn, String phoneNumber);
         void setView(RequiredViewOps view);
+        void sendAuthCode(String strAuthCode);
 
     }
 

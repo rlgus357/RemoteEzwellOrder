@@ -2,8 +2,10 @@ package com.hanbada.graves.main.view;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -17,7 +19,6 @@ import android.widget.Toast;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.hanbada.graves.R;
-import com.hanbada.graves.common.AuthCodeReceiver;
 import com.hanbada.graves.common.StateMaintainer;
 import com.hanbada.graves.main.Main;
 import com.hanbada.graves.main.model.MainModel;
@@ -30,7 +31,9 @@ public class MainActivity extends AppCompatActivity implements Main.RequiredView
     private Button mLoginBtn;
 
     private final StateMaintainer mStateMaintainer = new StateMaintainer( getSupportFragmentManager(), MainActivity.class.getName());
+
     private Main.ProvidedPresenterOps mPresenter;
+    private BroadcastReceiver mIntentReceiver;
 
     protected  final String TAG = getClass().getSimpleName();
 
@@ -52,8 +55,6 @@ public class MainActivity extends AppCompatActivity implements Main.RequiredView
                 .setDeniedMessage("[설정] > [권한] 에서 권한을 허용할 수 있어요.")
                 .setPermissions(Manifest.permission.READ_SMS,Manifest.permission.READ_PHONE_STATE)
                 .check();
-
-
     }
 
     private void setupView(){
@@ -111,6 +112,28 @@ public class MainActivity extends AppCompatActivity implements Main.RequiredView
             case R.id.EzwellLoginBtn:
                 mPresenter.clickLoginEzwell(mLoginBtn, this.getPhoneNumber());
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        IntentFilter intentFilter = new IntentFilter("SmsMessage.intent.MAIN");
+        mIntentReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String authCode = intent.getStringExtra("authCode");
+                mPresenter.sendAuthCode(authCode);
+
+            }
+        };
+        this.registerReceiver(mIntentReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.unregisterReceiver(this.mIntentReceiver);
     }
 
     public String getPhoneNumber(){
