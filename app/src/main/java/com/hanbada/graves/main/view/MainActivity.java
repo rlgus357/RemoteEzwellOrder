@@ -3,9 +3,8 @@ package com.hanbada.graves.main.view;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,12 +14,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 import com.hanbada.graves.R;
-import com.hanbada.graves.common.PermissionCheck;
+import com.hanbada.graves.common.AuthCodeReceiver;
 import com.hanbada.graves.common.StateMaintainer;
 import com.hanbada.graves.main.Main;
 import com.hanbada.graves.main.model.MainModel;
 import com.hanbada.graves.main.presenter.MainPresenter;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements Main.RequiredViewOps, View.OnClickListener {
 
@@ -39,7 +42,18 @@ public class MainActivity extends AppCompatActivity implements Main.RequiredView
         this.setupView();
         this.setupConfiguration();
 
-//        this.checkAndRequestPermissions();
+//        Intent i=new Intent("any string");
+//        i.setClass(this, AuthCodeReceiver.class);
+//        this.sendBroadcast(i);
+
+        TedPermission.with(this)
+                .setPermissionListener(permissionlistener)
+                .setRationaleMessage("사용을 위해서 다음과 같은 권한이 필요합니다.")
+                .setDeniedMessage("[설정] > [권한] 에서 권한을 허용할 수 있어요.")
+                .setPermissions(Manifest.permission.READ_SMS,Manifest.permission.READ_PHONE_STATE)
+                .check();
+
+
     }
 
     private void setupView(){
@@ -63,14 +77,6 @@ public class MainActivity extends AppCompatActivity implements Main.RequiredView
             mPresenter = mStateMaintainer.get(MainPresenter.class.getName());
             mPresenter.setView(this);
         }
-    }
-
-    private void checkAndRequestPermissions(){
-
-        PermissionCheck permissionCheck = new PermissionCheck();
-//        permissionCheck.isCheck(MainActivity.this,getAppContext(),"문자읽기","Manifest.permission.READ_SMS");
-//        permissionCheck.isCheck(MainActivity.this,getAppContext(),"Manifest.permission.READ_PHONE_NUMBERS","번호읽기");
-
     }
 
     @Override
@@ -124,34 +130,17 @@ public class MainActivity extends AppCompatActivity implements Main.RequiredView
         }
     }
 
-/*
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-
-        switch(requestCode){
-
-            case REQUEST_READ_PHONE_NUMBER : {
-                // If request is cancelled, the result arrays are empty.
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    Toast.makeText(this,"권한 승인", Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(this,"기능 사용을 위한 권한 동의가 필요합니다.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            case REQUEST_READ_PHONE_STATE : {
-                // If request is cancelled, the result arrays are empty.
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    Toast.makeText(this,"권한 승인", Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(this,"기능 사용을 위한 권한 동의가 필요합니다.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
+    PermissionListener permissionlistener = new PermissionListener() {
+        @Override
+        public void onPermissionGranted() {
+            Toast.makeText(MainActivity.this, "권한 허가", Toast.LENGTH_SHORT).show();
         }
-    }
-*/
+
+        @Override
+        public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+            Toast.makeText(MainActivity.this, "권한 거부\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+        }
+    };
 
 
 
