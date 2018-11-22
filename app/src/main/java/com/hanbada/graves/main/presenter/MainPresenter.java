@@ -62,7 +62,24 @@ public class MainPresenter implements Main.ProvidedPresenterOps, Main.RequiredPr
 
     @Override
     public void sendAuthCode(String strAuthCode) {
+
         Log.d(TAG,strAuthCode);
+
+        String strConnectionUrl = "Http://" + Contants.CONNECTION_IP + ":8080/Graves/SendAuthCode.do";
+
+        ContentValues authCodeContent = new ContentValues();
+        authCodeContent.put("authCode",strAuthCode);
+        NetworkTask networkTask = new NetworkTask(strConnectionUrl, authCodeContent);
+        String result = "";
+        try {
+            result = networkTask.execute().get();
+        }catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG,result);
+
     }
 
     public void setModel(MainModel model) {
