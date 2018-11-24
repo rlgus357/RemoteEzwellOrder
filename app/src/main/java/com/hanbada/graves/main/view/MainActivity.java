@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -110,7 +111,12 @@ public class MainActivity extends AppCompatActivity implements Main.RequiredView
         Log.d(TAG,"onClick Method 호출");
         switch (v.getId()){
             case R.id.EzwellLoginBtn:
-                mPresenter.clickLoginEzwell(mLoginBtn, this.getPhoneNumber());
+                if(this.isNetworkConnected()){
+                    mPresenter.clickLoginEzwell(mLoginBtn, this.getPhoneNumber());
+                }else{
+                    Toast.makeText(MainActivity.this, "네트워크 연결 확인해주세요.", Toast.LENGTH_SHORT).show();
+                }
+
         }
     }
 
@@ -151,6 +157,13 @@ public class MainActivity extends AppCompatActivity implements Main.RequiredView
             Log.d(TAG, "Read phone Number =>" + phoneNumber);
             return phoneMgr.getLine1Number();
         }
+    }
+
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null;
     }
 
     PermissionListener permissionlistener = new PermissionListener() {

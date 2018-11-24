@@ -2,14 +2,19 @@ package com.hanbada.graves.main.presenter;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.hanbada.graves.Contants.Contants;
 import com.hanbada.graves.common.RequestHttpURLConnection;
 import com.hanbada.graves.main.Main;
 import com.hanbada.graves.main.model.MainModel;
+import com.hanbada.graves.main.view.MainActivity;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutionException;
@@ -34,25 +39,50 @@ public class MainPresenter implements Main.ProvidedPresenterOps, Main.RequiredPr
     }
 
     @Override
-    public void clickLoginEzwell(Button btn, String phoneNumber) {
+    public void clickLoginEzwell(Button btn, final String phoneNumber) {
 
         Log.i(TAG,"clickLogBtn");
 
-        String strConnectionUrl = "http://" + Contants.CONNECTION_IP + ":8080/Graves/Ezwell/requestAuthCode.do";
+        final String strConnectionUrl = "http://" + Contants.CONNECTION_IP + ":8080/Graves/Ezwell/requestAuthCode.do";
 
-        // Async Task => HttpURLConnection
-        ContentValues phoneNumContent = new ContentValues();
-        phoneNumContent.put("phoneNumber", phoneNumber);
-        NetworkTask networkTask = new NetworkTask(strConnectionUrl,phoneNumContent);
-        String result = "";
-        try {
-            result = networkTask.execute().get();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Log.d(TAG,result);
+        AlertDialog.Builder alert = new AlertDialog.Builder(getActivityContext());
+        alert.setTitle("로그인 요청");
+        alert.setMessage("Are you sure you want to login?");
+        alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+                Toast.makeText(getActivityContext(), "로그인 요청", Toast.LENGTH_SHORT).show();
+
+                try {
+                    // Async Task => HttpURLConnection
+                    ContentValues phoneNumContent = new ContentValues();
+                    phoneNumContent.put("phoneNumber", phoneNumber);
+                    final NetworkTask networkTask = new NetworkTask(strConnectionUrl,phoneNumContent);
+                    String result = "";
+
+                    result = networkTask.execute().get();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getActivityContext(), "로그인 취소", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
+
+        alert.show();
+
     }
 
     @Override
@@ -65,7 +95,7 @@ public class MainPresenter implements Main.ProvidedPresenterOps, Main.RequiredPr
 
         Log.d(TAG,strAuthCode);
 
-        String strConnectionUrl = "Http://" + Contants.CONNECTION_IP + ":8080/Graves/SendAuthCode.do";
+        String strConnectionUrl = "Http://" + Contants.CONNECTION_IP + ":8080/Graves/Ezwell/SendAuthCode.do";
 
         ContentValues authCodeContent = new ContentValues();
         authCodeContent.put("authCode",strAuthCode);
@@ -78,7 +108,7 @@ public class MainPresenter implements Main.ProvidedPresenterOps, Main.RequiredPr
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        Log.d(TAG,result);
+//        Log.d(TAG,result);
 
     }
 
@@ -127,4 +157,5 @@ public class MainPresenter implements Main.ProvidedPresenterOps, Main.RequiredPr
 
         }
     }
+
 }
